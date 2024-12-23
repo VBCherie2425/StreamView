@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="goldGradient" cx="40%" cy="40%" r="60%" fx="40%" fy="40%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#DAA520;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background circle with rough edges -->
+  <path d="M 256,26 
+           C 380,26 486,132 486,256 
+           C 486,380 380,486 256,486 
+           C 132,486 26,380 26,256 
+           C 26,132 132,26 256,26 Z" 
+        fill="url(#goldGradient)" 
+        stroke="none" />
+  
+  <!-- Black edge overlay -->
+  <path d="M 256,16 
+           C 380,16 496,132 496,256 
+           C 496,380 380,496 256,496 
+           C 132,496 16,380 16,256 
+           C 16,132 132,16 256,16 Z 
+           M 256,26 
+           C 380,26 486,132 486,256 
+           C 486,380 380,486 256,486 
+           C 132,486 26,380 26,256 
+           C 26,132 132,26 256,26 Z" 
+        fill="black" />
+  
+  <!-- TV Screen icon -->
+  <g transform="translate(156, 156)">
+    <rect width="120" height="80" 
+          fill="none" stroke="#000000" stroke-width="12" 
+          transform="rotate(-15)" />
+  </g>
+  
+  <!-- CIARO TV text -->
+  <g transform="translate(256, 300)">
+    <text x="0" y="0" 
+          font-family="Arial Black, sans-serif" 
+          font-size="82" 
+          text-anchor="middle" 
+          fill="#000000" 
+          font-weight="900"
+          transform="rotate(-8)">CIARO TV</text>
+  </g>
+  
+  <!-- Subtitle -->
+  <g transform="translate(256, 350)">
+    <text x="0" y="0" 
+          font-family="Arial, sans-serif" 
+          font-size="28" 
+          text-anchor="middle" 
+          fill="#000000"
+          transform="rotate(-8)" letter-spacing="2">best in town</text>
+  </g>
+</svg>

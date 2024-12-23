@@ -1,0 +1,43 @@
+body {
+    background-color: #121212;
+}
+
+.card {
+    border: 1px solid #2d2d2d;
+    background-color: #1e1e1e !important;
+}
+
+.list-group-item {
+    background-color: #1e1e1e;
+    border-color: #2d2d2d;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #2d2d2d;
+}
+
+.list-group-item.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-control {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    color: #fff;
+}
+
+.form-control:focus {
+    background-color: #2d2d2d;
+    border-color: #0d6efd;
+    color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+#videoPlayer {
+    background-color: #000;
+    border-radius: 4px;
+}

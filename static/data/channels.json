@@ -1,0 +1,94 @@
+{
+    "live_tv": [
+        {
+            "name": "NASA TV Public",
+            "url": "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8",
+            "category": "Science",
+            "logo": "https://www.nasa.gov/sites/default/files/thumbnails/image/nasa-logo-web-rgb.png"
+        },
+        {
+            "name": "Red Bull TV",
+            "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+            "category": "Sports",
+            "logo": "https://www.redbull.com/v3/resources/images/appicon/android-chrome-192.png"
+        },
+        {
+            "name": "Bloomberg TV",
+            "url": "https://bloomberg-bloomberg-1-eu.rakuten.wurl.tv/playlist.m3u8",
+            "category": "News",
+            "logo": "https://assets.bwbx.io/s3/javelin/public/hub/images/bloomberg-logo-black-ef460f5b92.png"
+        },
+        {
+            "name": "France 24",
+            "url": "https://d36i3h2svrcvqa.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-0lvc4h1b4cel1-prod/France24_fr.m3u8",
+            "category": "News",
+            "logo": "https://upload.wikimedia.org/wikipedia/commons/8/8a/France24.png"
+        },
+        {
+            "name": "Weather Nation",
+            "url": "https://d2ferbiwcx1539.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-8zd3mhkvpjf24/playlist.m3u8",
+            "category": "Weather",
+            "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Weather_Nation_Logo.svg/1200px-Weather_Nation_Logo.svg.png"
+        }
+    ],
+    "media": [
+        {
+            "name": "Big Buck Bunny",
+            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "type": "movie",
+            "thumbnail": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+            "duration": "9:56"
+        },
+        {
+            "name": "Elephants Dream",
+            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            "type": "movie",
+            "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Elephants_Dream_1.jpg/1200px-Elephants_Dream_1.jpg",
+            "duration": "10:54"
+        }
+    ],
+    "guide": {
+        "NASA TV Public": [
+            {
+                "start": "00:00",
+                "end": "02:00",
+                "title": "Space Station Live",
+                "description": "Live feed from the International Space Station"
+            },
+            {
+                "start": "02:00",
+                "end": "04:00",
+                "title": "NASA Documentary",
+                "description": "Exploring the history of space exploration"
+            }
+        ],
+        "Red Bull TV": [
+            {
+                "start": "00:00",
+                "end": "01:30",
+                "title": "Extreme Sports",
+                "description": "Best of extreme sports highlights"
+            },
+            {
+                "start": "01:30",
+                "end": "03:00",
+                "title": "Air Race",
+                "description": "Red Bull Air Race World Championship"
+            }
+        ],
+        "Bloomberg TV": [
+            {
+                "start": "00:00",
+                "end": "01:00",
+                "title": "Bloomberg Markets",
+                "description": "Global financial news and analysis"
+            },
+            {
+                "start": "01:00",
+                "end": "02:00",
+                "title": "Bloomberg Technology",
+                "description": "Latest in technology and innovation"
+            }
+        ]
+    }
+}

@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIARO TV - Professional Streaming Platform</title>
+    <link rel="icon" type="image/png" href="static/img/favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #fff;
+        }
+        .nav-link.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+        }
+        .nav-link {
+            color: #fff;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .nav-link:hover {
+            background-color: rgba(13, 110, 253, 0.5);
+            color: white;
+        }
+        .stream-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            transition: all 0.3s ease;
+        }
+        .stream-card:hover {
+            transform: translateY(-5px);
+            border-color: #0d6efd;
+        }
+        .channel-item {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .channel-item:hover {
+            background: #2a2a2a;
+            border-color: #0d6efd;
+        }
+        .channel-item.active {
+            background: #0d6efd;
+        }
+        .program-guide {
+            display: grid;
+            grid-template-columns: 200px repeat(24, 120px);
+            overflow-x: auto;
+            gap: 1px;
+            background: #2a2a2a;
+        }
+        .program-time {
+            background: #1a1a1a;
+            padding: 0.5rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .program-channel {
+            background: #1a1a1a;
+            padding: 0.5rem;
+            position: sticky;
+            left: 0;
+        }
+        .program-item {
+            background: #1a1a1a;
+            padding: 0.5rem;
+            border: 1px solid #2a2a2a;
+            cursor: pointer;
+        }
+        .program-item:hover {
+            background: #2a2a2a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 py-3 border-end border-secondary" style="min-height: 100vh;">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <div class="container-fluid">
+                        <a class="navbar-brand d-flex align-items-center" href="#">
+                            <span style="color: #007bff; font-weight: bold; font-size: 1.4rem;">CIARO</span><span style="color: #dc3545; font-weight: bold; font-size: 1.4rem;">TV</span>
+                            <span style="color: #6c757d; font-size: 0.8rem; margin-left: 5px;">best in town</span>
+                        </a>
+                    </div>
+                </nav>
+                <div class="nav flex-column">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#live-tv-tab">
+                        <i class="bi bi-broadcast me-2"></i>Live TV
+                    </a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#media-tab">
+                        <i class="bi bi-collection-play me-2"></i>Media
+                    </a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#guide-tab">
+                        <i class="bi bi-calendar3 me-2"></i>Guide
+                    </a>
+                    <a class="nav-link" data-bs-toggle="tab" href="#settings-tab">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 py-3">
+                <div class="tab-content">
+                    <!-- Live TV Tab -->
+                    <div class="tab-pane fade show active" id="live-tv-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card bg-dark mb-3">
+                                    <div class="card-body">
+                                        <div id="videoPlayer" class="ratio ratio-16x9 mb-3">
+                                            <video id="player" controls class="w-100">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        </div>
+                                        <div id="streamInfo" class="d-none">
+                                            <h5 class="stream-title mb-2"></h5>
+                                            <div class="stream-details small text-muted"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Media Tab -->
+                    <div class="tab-pane fade" id="media-tab">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="mb-4">Media Library</h4>
+                                <div class="row g-4" id="mediaGrid">
+                                    <!-- Media items will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Guide Tab -->
+                    <div class="tab-pane fade" id="guide-tab">
+                        <h4 class="mb-4">TV Guide</h4>
+                        <div class="program-guide">
+                            <!-- Time headers -->
+                            <div class="program-time">Channel</div>
+                            <!-- 24 hour slots -->
+                            <div class="program-time">00:00</div>
+                            <div class="program-time">01:00</div>
+                            <!-- ... Add more time slots ... -->
+                            
+                            <!-- Channel rows will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Settings Tab -->
+                    <div class="tab-pane fade" id="settings-tab">
+                        <h4 class="mb-4">Settings</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Player Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Default Player</label>
+                                            <select class="form-select bg-dark text-light">
+                                                <option value="html5">HTML5 Player</option>
+                                                <option value="vlc">VLC Plugin</option>
+                                                <option value="mpv">MPV Player</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Quality Preference</label>
+                                            <select class="form-select bg-dark text-light">
+                                                <option value="auto">Auto</option>
+                                                <option value="best">Best</option>
+                                                <option value="balanced">Balanced</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Stream Management -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Stream Management</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addStreamModal">
+                                            <i class="bi bi-plus-lg me-2"></i>Add New Stream
+                                        </button>
+                                        <div class="table-responsive">
+                                            <table class="table table-dark table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Category</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="streamList">
+                                                    <!-- Stream list will be populated here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- URL Auto-Refresh Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">URL Auto-Refresh</h5>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="enableAutoRefresh" checked>
+                                            <label class="form-check-label">Enable</label>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Refresh Intervals -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Refresh Interval</label>
+                                            <select class="form-select bg-dark text-light" id="refreshInterval">
+                                                <option value="15">15 seconds</option>
+                                                <option value="30">30 seconds</option>
+                                                <option value="60" selected>1 minute</option>
+                                                <option value="120">2 minutes</option>
+                                                <option value="300">5 minutes</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- URL Types to Refresh -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Auto-Refresh URLs</label>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="liveUrlRefresh" checked>
+                                                        <label class="form-check-label">Live TV</label>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="sportsUrlRefresh" checked>
+                                                        <label class="form-check-label">Sports</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="epgUrlRefresh" checked>
+                                                        <label class="form-check-label">EPG Guide</label>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="vodUrlRefresh">
+                                                        <label class="form-check-label">VOD Content</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Error Handling -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Error Handling</label>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" id="refreshOnError" checked>
+                                                        <label class="form-check-label">Retry on Error</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <select class="form-select bg-dark text-light" id="maxRetries">
+                                                        <option value="1">1 retry</option>
+                                                        <option value="2" selected>2 retries</option>
+                                                        <option value="3">3 retries</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Status -->
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="text-muted">
+                                                    <small>Next refresh in: <span id="nextRefreshTime">60</span>s</small>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success" id="lastRefreshStatus">All URLs Active</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="refreshAllUrls()">
+                                                <i class="bi bi-arrow-clockwise me-2"></i>Refresh Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <script>
+                                    let refreshTimer;
+                                    let nextRefreshCountdown;
+
+                                    function startAutoRefresh() {
+                                        if (document.getElementById('enableAutoRefresh').checked) {
+                                            const interval = parseInt(document.getElementById('refreshInterval').value) * 1000;
+                                            clearInterval(refreshTimer);
+                                            clearInterval(nextRefreshCountdown);
+                                            
+                                            refreshTimer = setInterval(refreshUrls, interval);
+                                            startCountdown(interval/1000);
+                                            updateStatus('Auto-refresh enabled');
+                                        } else {
+                                            clearInterval(refreshTimer);
+                                            clearInterval(nextRefreshCountdown);
+                                            document.getElementById('nextRefreshTime').textContent = '--';
+                                            updateStatus('Auto-refresh disabled');
+                                        }
+                                    }
+
+                                    function startCountdown(seconds) {
+                                        let countdown = seconds;
+                                        const countdownElement = document.getElementById('nextRefreshTime');
+                                        
+                                        clearInterval(nextRefreshCountdown);
+                                        nextRefreshCountdown = setInterval(() => {
+                                            countdown--;
+                                            countdownElement.textContent = countdown;
+                                            if (countdown <= 0) {
+                                                countdown = parseInt(document.getElementById('refreshInterval').value);
+                                            }
+                                        }, 1000);
+                                    }
+
+                                    function refreshUrls() {
+                                        const promises = [];
+                                        
+                                        if (document.getElementById('liveUrlRefresh').checked) {
+                                            promises.push(refreshLiveUrls());
+                                        }
+                                        if (document.getElementById('vodUrlRefresh').checked) {
+                                            promises.push(refreshVodUrls());
+                                        }
+                                        if (document.getElementById('sportsUrlRefresh').checked) {
+                                            promises.push(refreshSportsUrls());
+                                        }
+                                        if (document.getElementById('epgUrlRefresh').checked) {
+                                            promises.push(refreshEpgUrls());
+                                        }
+
+                                        Promise.all(promises)
+                                            .then(() => updateStatus('All URLs Active', 'success'))
+                                            .catch(() => updateStatus('Refresh Error', 'danger'));
+                                    }
+
+                                    async function refreshLiveUrls() {
+                                        // Simulated async refresh
+                                        return new Promise((resolve) => setTimeout(resolve, 500));
+                                    }
+
+                                    async function refreshVodUrls() {
+                                        return new Promise((resolve) => setTimeout(resolve, 500));
+                                    }
+
+                                    async function refreshSportsUrls() {
+                                        return new Promise((resolve) => setTimeout(resolve, 500));
+                                    }
+
+                                    async function refreshEpgUrls() {
+                                        return new Promise((resolve) => setTimeout(resolve, 500));
+                                    }
+
+                                    function updateStatus(message, type = 'success') {
+                                        const statusElement = document.getElementById('lastRefreshStatus');
+                                        statusElement.textContent = message;
+                                        statusElement.className = `badge bg-${type}`;
+                                    }
+
+                                    function refreshAllUrls() {
+                                        refreshUrls();
+                                        startAutoRefresh();
+                                    }
+
+                                    // Event listeners
+                                    document.getElementById('enableAutoRefresh').addEventListener('change', startAutoRefresh);
+                                    document.getElementById('refreshInterval').addEventListener('change', startAutoRefresh);
+
+                                    // Start on page load
+                                    document.addEventListener('DOMContentLoaded', startAutoRefresh);
+
+                                    // Handle visibility changes
+                                    document.addEventListener('visibilitychange', () => {
+                                        if (document.visibilityState === 'visible') {
+                                            refreshAllUrls();
+                                        }
+                                    });
+                                </script>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- ExoPlayer Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">ExoPlayer Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Core Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Core Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="exoPlayerVersion">
+                                                <option value="2.19.1">ExoPlayer 2.19.1 (Latest)</option>
+                                                <option value="2.19.0">ExoPlayer 2.19.0</option>
+                                                <option value="2.18.7">ExoPlayer 2.18.7</option>
+                                            </select>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="exoPlayerExtensions" checked>
+                                                <label class="form-check-label">Enable Media3 Extensions</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Playback Features -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Playback Features</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="adaptivePlayback" checked>
+                                                <label class="form-check-label">Adaptive Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="offlinePlayback" checked>
+                                                <label class="form-check-label">Offline Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="backgroundPlayback" checked>
+                                                <label class="form-check-label">Background Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="lowLatencyMode" checked>
+                                                <label class="form-check-label">Low Latency Mode</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Media Format Support -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Media Format Support</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hlsSupport" checked>
+                                                <label class="form-check-label">HLS Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dashSupport" checked>
+                                                <label class="form-check-label">DASH Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="smoothStreamingSupport">
+                                                <label class="form-check-label">Smooth Streaming</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="rtspSupport">
+                                                <label class="form-check-label">RTSP Support</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Advanced Features -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Advanced Features</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="drmSupport" checked>
+                                                <label class="form-check-label">DRM Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="multiWindow" checked>
+                                                <label class="form-check-label">Multi-Window Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="frameRendering" checked>
+                                                <label class="form-check-label">Frame-Accurate Rendering</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="customLoadControl" checked>
+                                                <label class="form-check-label">Custom Load Control</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Performance Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Performance Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="bufferSize">
+                                                <option value="default">Default Buffer Size</option>
+                                                <option value="low">Low Latency (15s)</option>
+                                                <option value="medium">Medium (30s)</option>
+                                                <option value="high">High Quality (60s)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="renderingMode">
+                                                <option value="surface">Surface View (Default)</option>
+                                                <option value="texture">Texture View</option>
+                                                <option value="gl">GL Surface View</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Debug Options -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Debug Options</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eventLogging">
+                                                <label class="form-check-label">Event Logging</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mediaCodecDebug">
+                                                <label class="form-check-label">MediaCodec Debug</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="playbackStats">
+                                                <label class="form-check-label">Playback Statistics</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="applyExoPlayerSettings()">
+                                                <i class="bi bi-check-circle me-2"></i>Apply Settings
+                                            </button>
+                                            <button class="btn btn-info" onclick="testExoPlayer()">
+                                                <i class="bi bi-play-circle me-2"></i>Test Player
+                                            </button>
+                                            <button class="btn btn-warning" onclick="resetExoPlayer()">
+                                                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset to Default
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- Codec Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Codec Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Video Codecs -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Video Codecs</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h264" checked>
+                                                <label class="form-check-label">H.264/AVC (High Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h264Main">
+                                                <label class="form-check-label">H.264/AVC (Main Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h264Baseline">
+                                                <label class="form-check-label">H.264/AVC (Baseline Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h265" checked>
+                                                <label class="form-check-label">H.265/HEVC (Main Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h265Main10" checked>
+                                                <label class="form-check-label">H.265/HEVC (Main 10 Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vp8">
+                                                <label class="form-check-label">VP8</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vp9" checked>
+                                                <label class="form-check-label">VP9 (Profile 0)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vp9Profile2" checked>
+                                                <label class="form-check-label">VP9 (Profile 2/10-bit)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="av1" checked>
+                                                <label class="form-check-label">AV1 (Main Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="av1High" checked>
+                                                <label class="form-check-label">AV1 (High Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mpeg2">
+                                                <label class="form-check-label">MPEG-2</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mpeg4">
+                                                <label class="form-check-label">MPEG-4 ASP</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vc1">
+                                                <label class="form-check-label">VC-1</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="theora">
+                                                <label class="form-check-label">Theora</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Audio Codecs -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Audio Codecs</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="aac" checked>
+                                                <label class="form-check-label">AAC-LC</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="aacPlus" checked>
+                                                <label class="form-check-label">HE-AAC v1 (AAC+)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="aacPlusV2" checked>
+                                                <label class="form-check-label">HE-AAC v2 (Enhanced AAC+)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="ac3" checked>
+                                                <label class="form-check-label">AC3 (Dolby Digital)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eac3" checked>
+                                                <label class="form-check-label">E-AC3 (Dolby Digital Plus)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="truehd" checked>
+                                                <label class="form-check-label">Dolby TrueHD</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dts" checked>
+                                                <label class="form-check-label">DTS</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dtsHD" checked>
+                                                <label class="form-check-label">DTS-HD MA</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dtsExpress">
+                                                <label class="form-check-label">DTS Express</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mp3" checked>
+                                                <label class="form-check-label">MP3</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="opus" checked>
+                                                <label class="form-check-label">Opus</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vorbis">
+                                                <label class="form-check-label">Vorbis</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="flac">
+                                                <label class="form-check-label">FLAC</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="alac">
+                                                <label class="form-check-label">ALAC (Apple Lossless)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="pcm">
+                                                <label class="form-check-label">PCM (Uncompressed)</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Hardware Acceleration -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Hardware Acceleration</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hwAcceleration" checked>
+                                                <label class="form-check-label">Enable Hardware Acceleration</label>
+                                            </div>
+                                            <select class="form-select bg-dark text-light mb-2" id="hwAccelType">
+                                                <option value="auto">Automatic Selection</option>
+                                                <option value="mediacodec">MediaCodec (Android)</option>
+                                                <option value="mediacodec-platform">MediaCodec Platform (Android)</option>
+                                                <option value="videotoolbox">VideoToolbox (iOS/macOS)</option>
+                                                <option value="d3d11va">D3D11VA (Windows)</option>
+                                                <option value="d3d12va">D3D12VA (Windows)</option>
+                                                <option value="dxva2">DXVA2 (Windows Legacy)</option>
+                                                <option value="vaapi">VAAPI (Linux)</option>
+                                                <option value="vdpau">VDPAU (Linux)</option>
+                                                <option value="nvdec">NVDEC (NVIDIA)</option>
+                                                <option value="cuda">CUDA (NVIDIA)</option>
+                                                <option value="qsv">QuickSync (Intel)</option>
+                                                <option value="amf">AMF (AMD)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Quality Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Quality Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="videoQuality">
+                                                <option value="auto">Auto (Adaptive)</option>
+                                                <option value="8k">8K (4320p)</option>
+                                                <option value="4k">4K (2160p)</option>
+                                                <option value="2k">2K (1440p)</option>
+                                                <option value="1080p">Full HD (1080p)</option>
+                                                <option value="720p">HD (720p)</option>
+                                                <option value="480p">SD (480p)</option>
+                                                <option value="360p">Low (360p)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="audioQuality">
+                                                <option value="auto">Auto</option>
+                                                <option value="lossless">Lossless</option>
+                                                <option value="ultra">Ultra (512 kbps)</option>
+                                                <option value="high">High (320 kbps)</option>
+                                                <option value="medium">Medium (192 kbps)</option>
+                                                <option value="low">Low (128 kbps)</option>
+                                                <option value="minimal">Minimal (96 kbps)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="bitrateMode">
+                                                <option value="cbr">CBR (Constant Bitrate)</option>
+                                                <option value="vbr">VBR (Variable Bitrate)</option>
+                                                <option value="abr">ABR (Average Bitrate)</option>
+                                                <option value="crf">CRF (Constant Rate Factor)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Advanced Codec Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Advanced Settings</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hdr" checked>
+                                                <label class="form-check-label">HDR Support</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="multiAudio" checked>
+                                                <label class="form-check-label">Multi-Audio Support</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="subtitles" checked>
+                                                <label class="form-check-label">Subtitle Support</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="closedCaptions" checked>
+                                                <label class="form-check-label">Closed Captions</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Optimization Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Optimization</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dynamicRange" checked>
+                                                <label class="form-check-label">Dynamic Range Adaptation</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="frameRateMatching" checked>
+                                                <label class="form-check-label">Frame Rate Matching</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="deinterlacing" checked>
+                                                <label class="form-check-label">Deinterlacing</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="noiseReduction">
+                                                <label class="form-check-label">Noise Reduction</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="applyCodecSettings()">
+                                                <i class="bi bi-check-circle me-2"></i>Apply Codec Settings
+                                            </button>
+                                            <button class="btn btn-info" onclick="testCodecSupport()">
+                                                <i class="bi bi-play-circle me-2"></i>Test Codec Support
+                                            </button>
+                                            <button class="btn btn-warning" onclick="resetCodecSettings()">
+                                                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset to Default
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- URL Auto-Refresh Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">URL Auto-Refresh Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Global Auto-Refresh -->
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="urlHealthCheck">
+                                                <label class="form-check-label">Enable Health Checks</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="autoFailover">
+                                                <label class="form-check-label">Auto Failover</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="geoRouting">
+                                                <label class="form-check-label">Geographic Routing</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="sslVerification">
+                                                <label class="form-check-label">SSL Verification</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="testAllUrls()">
+                                                <i class="bi bi-check-circle me-2"></i>Test All URLs
+                                            </button>
+                                            <button class="btn btn-info" onclick="checkBandwidth()">
+                                                <i class="bi bi-speedometer2 me-2"></i>Check Bandwidth
+                                            </button>
+                                            <button class="btn btn-warning" onclick="exportUrlConfig()">
+                                                <i class="bi bi-download me-2"></i>Export URL Config
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- ExoPlayer Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">ExoPlayer Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Core Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Core Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="exoPlayerVersion">
+                                                <option value="2.19.1">ExoPlayer 2.19.1 (Latest)</option>
+                                                <option value="2.19.0">ExoPlayer 2.19.0</option>
+                                                <option value="2.18.7">ExoPlayer 2.18.7</option>
+                                            </select>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="exoPlayerExtensions" checked>
+                                                <label class="form-check-label">Enable Media3 Extensions</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Playback Features -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Playback Features</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="adaptivePlayback" checked>
+                                                <label class="form-check-label">Adaptive Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="offlinePlayback" checked>
+                                                <label class="form-check-label">Offline Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="backgroundPlayback" checked>
+                                                <label class="form-check-label">Background Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="lowLatencyMode" checked>
+                                                <label class="form-check-label">Low Latency Mode</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Media Format Support -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Media Format Support</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hlsSupport" checked>
+                                                <label class="form-check-label">HLS Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dashSupport" checked>
+                                                <label class="form-check-label">DASH Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="smoothStreamingSupport">
+                                                <label class="form-check-label">Smooth Streaming</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="rtspSupport">
+                                                <label class="form-check-label">RTSP Support</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Advanced Features -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Advanced Features</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="drmSupport" checked>
+                                                <label class="form-check-label">DRM Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="multiWindow" checked>
+                                                <label class="form-check-label">Multi-Window Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="frameRendering" checked>
+                                                <label class="form-check-label">Frame-Accurate Rendering</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="customLoadControl" checked>
+                                                <label class="form-check-label">Custom Load Control</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Performance Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Performance Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="bufferSize">
+                                                <option value="default">Default Buffer Size</option>
+                                                <option value="low">Low Latency (15s)</option>
+                                                <option value="medium">Medium (30s)</option>
+                                                <option value="high">High Quality (60s)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="renderingMode">
+                                                <option value="surface">Surface View (Default)</option>
+                                                <option value="texture">Texture View</option>
+                                                <option value="gl">GL Surface View</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Debug Options -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Debug Options</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eventLogging">
+                                                <label class="form-check-label">Event Logging</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mediaCodecDebug">
+                                                <label class="form-check-label">MediaCodec Debug</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="playbackStats">
+                                                <label class="form-check-label">Playback Statistics</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="applyExoPlayerSettings()">
+                                                <i class="bi bi-check-circle me-2"></i>Apply Settings
+                                            </button>
+                                            <button class="btn btn-info" onclick="testExoPlayer()">
+                                                <i class="bi bi-play-circle me-2"></i>Test Player
+                                            </button>
+                                            <button class="btn btn-warning" onclick="resetExoPlayer()">
+                                                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset to Default
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- Codec Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Codec Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Video Codecs -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Video Codecs</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h264" checked>
+                                                <label class="form-check-label">H.264/AVC (High Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h264Main">
+                                                <label class="form-check-label">H.264/AVC (Main Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h264Baseline">
+                                                <label class="form-check-label">H.264/AVC (Baseline Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h265" checked>
+                                                <label class="form-check-label">H.265/HEVC (Main Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="h265Main10" checked>
+                                                <label class="form-check-label">H.265/HEVC (Main 10 Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vp8">
+                                                <label class="form-check-label">VP8</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vp9" checked>
+                                                <label class="form-check-label">VP9 (Profile 0)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vp9Profile2" checked>
+                                                <label class="form-check-label">VP9 (Profile 2/10-bit)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="av1" checked>
+                                                <label class="form-check-label">AV1 (Main Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="av1High" checked>
+                                                <label class="form-check-label">AV1 (High Profile)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mpeg2">
+                                                <label class="form-check-label">MPEG-2</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mpeg4">
+                                                <label class="form-check-label">MPEG-4 ASP</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vc1">
+                                                <label class="form-check-label">VC-1</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="theora">
+                                                <label class="form-check-label">Theora</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Audio Codecs -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Audio Codecs</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="aac" checked>
+                                                <label class="form-check-label">AAC-LC</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="aacPlus" checked>
+                                                <label class="form-check-label">HE-AAC v1 (AAC+)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="aacPlusV2" checked>
+                                                <label class="form-check-label">HE-AAC v2 (Enhanced AAC+)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="ac3" checked>
+                                                <label class="form-check-label">AC3 (Dolby Digital)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eac3" checked>
+                                                <label class="form-check-label">E-AC3 (Dolby Digital Plus)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="truehd" checked>
+                                                <label class="form-check-label">Dolby TrueHD</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dts" checked>
+                                                <label class="form-check-label">DTS</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dtsHD" checked>
+                                                <label class="form-check-label">DTS-HD MA</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dtsExpress">
+                                                <label class="form-check-label">DTS Express</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mp3" checked>
+                                                <label class="form-check-label">MP3</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="opus" checked>
+                                                <label class="form-check-label">Opus</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="vorbis">
+                                                <label class="form-check-label">Vorbis</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="flac">
+                                                <label class="form-check-label">FLAC</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="alac">
+                                                <label class="form-check-label">ALAC (Apple Lossless)</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="pcm">
+                                                <label class="form-check-label">PCM (Uncompressed)</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Hardware Acceleration -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Hardware Acceleration</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hwAcceleration" checked>
+                                                <label class="form-check-label">Enable Hardware Acceleration</label>
+                                            </div>
+                                            <select class="form-select bg-dark text-light mb-2" id="hwAccelType">
+                                                <option value="auto">Automatic Selection</option>
+                                                <option value="mediacodec">MediaCodec (Android)</option>
+                                                <option value="mediacodec-platform">MediaCodec Platform (Android)</option>
+                                                <option value="videotoolbox">VideoToolbox (iOS/macOS)</option>
+                                                <option value="d3d11va">D3D11VA (Windows)</option>
+                                                <option value="d3d12va">D3D12VA (Windows)</option>
+                                                <option value="dxva2">DXVA2 (Windows Legacy)</option>
+                                                <option value="vaapi">VAAPI (Linux)</option>
+                                                <option value="vdpau">VDPAU (Linux)</option>
+                                                <option value="nvdec">NVDEC (NVIDIA)</option>
+                                                <option value="cuda">CUDA (NVIDIA)</option>
+                                                <option value="qsv">QuickSync (Intel)</option>
+                                                <option value="amf">AMF (AMD)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Quality Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Quality Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="videoQuality">
+                                                <option value="auto">Auto (Adaptive)</option>
+                                                <option value="8k">8K (4320p)</option>
+                                                <option value="4k">4K (2160p)</option>
+                                                <option value="2k">2K (1440p)</option>
+                                                <option value="1080p">Full HD (1080p)</option>
+                                                <option value="720p">HD (720p)</option>
+                                                <option value="480p">SD (480p)</option>
+                                                <option value="360p">Low (360p)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="audioQuality">
+                                                <option value="auto">Auto</option>
+                                                <option value="lossless">Lossless</option>
+                                                <option value="ultra">Ultra (512 kbps)</option>
+                                                <option value="high">High (320 kbps)</option>
+                                                <option value="medium">Medium (192 kbps)</option>
+                                                <option value="low">Low (128 kbps)</option>
+                                                <option value="minimal">Minimal (96 kbps)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="bitrateMode">
+                                                <option value="cbr">CBR (Constant Bitrate)</option>
+                                                <option value="vbr">VBR (Variable Bitrate)</option>
+                                                <option value="abr">ABR (Average Bitrate)</option>
+                                                <option value="crf">CRF (Constant Rate Factor)</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Advanced Codec Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Advanced Settings</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hdr" checked>
+                                                <label class="form-check-label">HDR Support</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="multiAudio" checked>
+                                                <label class="form-check-label">Multi-Audio Support</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="subtitles" checked>
+                                                <label class="form-check-label">Subtitle Support</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="closedCaptions" checked>
+                                                <label class="form-check-label">Closed Captions</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Optimization Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Optimization</label>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dynamicRange" checked>
+                                                <label class="form-check-label">Dynamic Range Adaptation</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="frameRateMatching" checked>
+                                                <label class="form-check-label">Frame Rate Matching</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="deinterlacing" checked>
+                                                <label class="form-check-label">Deinterlacing</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="noiseReduction">
+                                                <label class="form-check-label">Noise Reduction</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="applyCodecSettings()">
+                                                <i class="bi bi-check-circle me-2"></i>Apply Codec Settings
+                                            </button>
+                                            <button class="btn btn-info" onclick="testCodecSupport()">
+                                                <i class="bi bi-play-circle me-2"></i>Test Codec Support
+                                            </button>
+                                            <button class="btn btn-warning" onclick="resetCodecSettings()">
+                                                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset to Default
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- URL Auto-Refresh Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">URL Auto-Refresh Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Global Auto-Refresh -->
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="urlHealthCheck">
+                                                <label class="form-check-label">Enable Health Checks</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="autoFailover">
+                                                <label class="form-check-label">Auto Failover</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="geoRouting">
+                                                <label class="form-check-label">Geographic Routing</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="sslVerification">
+                                                <label class="form-check-label">SSL Verification</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="testAllUrls()">
+                                                <i class="bi bi-check-circle me-2"></i>Test All URLs
+                                            </button>
+                                            <button class="btn btn-info" onclick="checkBandwidth()">
+                                                <i class="bi bi-speedometer2 me-2"></i>Check Bandwidth
+                                            </button>
+                                            <button class="btn btn-warning" onclick="exportUrlConfig()">
+                                                <i class="bi bi-download me-2"></i>Export URL Config
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- ExoPlayer Settings -->
+                                <div class="card bg-dark mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">ExoPlayer Settings</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Core Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Core Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="exoPlayerVersion">
+                                                <option value="2.19.1">ExoPlayer 2.19.1 (Latest)</option>
+                                                <option value="2.19.0">ExoPlayer 2.19.0</option>
+                                                <option value="2.18.7">ExoPlayer 2.18.7</option>
+                                            </select>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="exoPlayerExtensions" checked>
+                                                <label class="form-check-label">Enable Media3 Extensions</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Playback Features -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Playback Features</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="adaptivePlayback" checked>
+                                                <label class="form-check-label">Adaptive Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="offlinePlayback" checked>
+                                                <label class="form-check-label">Offline Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="backgroundPlayback" checked>
+                                                <label class="form-check-label">Background Playback</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="lowLatencyMode" checked>
+                                                <label class="form-check-label">Low Latency Mode</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Media Format Support -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Media Format Support</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="hlsSupport" checked>
+                                                <label class="form-check-label">HLS Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="dashSupport" checked>
+                                                <label class="form-check-label">DASH Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="smoothStreamingSupport">
+                                                <label class="form-check-label">Smooth Streaming</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="rtspSupport">
+                                                <label class="form-check-label">RTSP Support</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Advanced Features -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Advanced Features</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="drmSupport" checked>
+                                                <label class="form-check-label">DRM Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="multiWindow" checked>
+                                                <label class="form-check-label">Multi-Window Support</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="frameRendering" checked>
+                                                <label class="form-check-label">Frame-Accurate Rendering</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="customLoadControl" checked>
+                                                <label class="form-check-label">Custom Load Control</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Performance Settings -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Performance Settings</label>
+                                            <select class="form-select bg-dark text-light mb-2" id="bufferSize">
+                                                <option value="default">Default Buffer Size</option>
+                                                <option value="low">Low Latency (15s)</option>
+                                                <option value="medium">Medium (30s)</option>
+                                                <option value="high">High Quality (60s)</option>
+                                            </select>
+                                            <select class="form-select bg-dark text-light mb-2" id="renderingMode">
+                                                <option value="surface">Surface View (Default)</option>
+                                                <option value="texture">Texture View</option>
+                                                <option value="gl">GL Surface View</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Debug Options -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Debug Options</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eventLogging">
+                                                <label class="form-check-label">Event Logging</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="mediaCodecDebug">
+                                                <label class="form-check-label">MediaCodec Debug</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" id="playbackStats">
+                                                <label class="form-check-label">Playback Statistics</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="applyExoPlayerSettings()">
+                                                <i class="bi bi-check-circle me-2"></i>Apply Settings
+                                            </button>
+                                            <button class="btn btn-info" onclick="testExoPlayer()">
+                                                <i class="bi bi-play-circle me-2"></i>Test Player
+                                            </button>
+                                            <button class="btn btn-warning" onclick="resetExoPlayer()">
+                                                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset to Default
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Stream Modal -->
+    <div class="modal fade" id="addStreamModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Add Stream - <span style="color: #007bff;">CIARO</span><span style="color: #dc3545;">TV</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStreamForm">
+                        <div class="mb-3">
+                            <label for="playlistName" class="form-label">Playlist Name</label>
+                            <input type="text" class="form-control bg-dark text-light" id="playlistName" required placeholder="Enter playlist name (e.g. My Live TV Channels)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="playlistUrl" class="form-label">Playlist URL (M3U/M3U8)</label>
+                            <input type="url" class="form-control bg-dark text-light" id="playlistUrl" required placeholder="http://example.com/playlist.m3u8">
+                            <div class="form-text text-muted">Supports M3U, M3U8, and XTREAM formats</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="playlistType" class="form-label">Playlist Type</label>
+                            <select class="form-select bg-dark text-light" id="playlistType" required>
+                                <option value="m3u">M3U/M3U8</option>
+                                <option value="xtream">Xtream</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="playlistCategory" class="form-label">Category</label>
+                            <select class="form-select bg-dark text-light" id="playlistCategory" required>
+                                <option value="live">Live TV</option>
+                                <option value="movies">Movies</option>
+                                <option value="series">TV Series</option>
+                                <option value="sports">Sports</option>
+                                <option value="news">News</option>
+                                <option value="music">Music</option>
+                                <option value="kids">Kids</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="autoUpdate">
+                            <label class="form-check-label" for="autoUpdate">Auto-update playlist</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="addStreamForm" class="btn btn-primary">Add Playlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/settings-lock.js"></script>
+</body>
+</html>
