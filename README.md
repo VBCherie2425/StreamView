@@ -1,4 +1,4 @@
-# StreamView - IPTV Streaming Application
+# StreamView - Professional IPTV Streaming Application
 
 ## Installation Guide
 
